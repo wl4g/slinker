@@ -1,4 +1,5 @@
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
+// import { RedirectError } from "next/dist/client/components/redirect";
 import { getShortenedUrl, incrementClicks, initializeDatabase } from "@/lib/db";
 
 export default async function RedirectPage({
@@ -39,13 +40,16 @@ export default async function RedirectPage({
     console.log("🚀 Redirecting to:", targetUrl);
 
     // Redirect to the original URL immediately
-    return redirect(targetUrl + "?from=linkshort");
-  } catch (error) {
+    return redirect(targetUrl + "?from=shortlinker");
+  } catch (error: unknown) {
     // TODO: Strangeness? Why does Nextjs normally throw an exception to redirect?
     if (error instanceof Error && error.message == "NEXT_REDIRECT") {
-      let targetUrl = error.digest.split(";")[2];
-      console.log("🚀 Redirecting to:", targetUrl);
-      return redirect(targetUrl);
+      const redirectType = error as { digest?: string };
+      if (redirectType.digest) {
+        const targetUrl = redirectType.digest.split(";")[2];
+        console.log("🚀 Fallback Redirecting to:", targetUrl);
+        return redirect(targetUrl, RedirectType.push);
+      }
     }
     console.error("❌ Real error:", error);
     return redirect("/?error");
