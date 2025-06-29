@@ -14,7 +14,7 @@ let nextId = 1
 
 // Check if we're in production with Vercel Postgres
 function isVercelPostgresAvailable() {
-  return !!(process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL)
+  return !!(process.env.POSTGRES_URL || process.env.DATABASE_URL)
 }
 
 // Initialize database table if it doesn't exist (Vercel Postgres only)

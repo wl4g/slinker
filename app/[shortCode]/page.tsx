@@ -23,7 +23,6 @@ export default async function RedirectPage({
       // If URL not found, redirect to home page
       redirect("/");
     }
-
     console.log("✅ Found URL data:", urlData);
 
     // Increment click counter (async, don't wait)
