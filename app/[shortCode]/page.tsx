@@ -8,7 +8,7 @@ export default async function RedirectPage({
   params: { shortCode: string };
 }) {
   const { shortCode } = params;
-
+  let targetUrl = "/";
   try {
     console.log("🔍 Accessing short code:", shortCode);
 
@@ -32,11 +32,10 @@ export default async function RedirectPage({
     );
 
     // Ensure the URL has a protocol
-    let targetUrl = urlData.original_url;
+    targetUrl = urlData.original_url;
     if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
       targetUrl = "https://" + targetUrl;
     }
-
     console.log("🚀 Redirecting to:", targetUrl);
 
     // Redirect to the original URL immediately
@@ -46,7 +45,6 @@ export default async function RedirectPage({
     if (error instanceof Error && error.message == "NEXT_REDIRECT") {
       const redirectType = error as { digest?: string };
       if (redirectType.digest) {
-        const targetUrl = redirectType.digest.split(";")[2];
         console.log("🚀 Fallback Redirecting to:", targetUrl);
         return redirect(targetUrl, RedirectType.push);
       }
