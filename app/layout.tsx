@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'ShortLinker - Professional URL Shortener',
+  title: 'SLinker - Professional URL Shortener',
   description: 'Transform long URLs into clean, manageable short links. Perfect for social media, email campaigns, and anywhere you need to share links efficiently.',
 };
 

@@ -38,7 +38,7 @@ export default async function RedirectPage({
     console.log("🚀 Redirecting to:", targetUrl);
 
     // Redirect to the original URL immediately
-    return redirect(targetUrl + "?from=shortlinker");
+    return redirect(targetUrl + "?from=slinker");
   } catch (error: unknown) {
     // TODO: Strangeness? Why does Nextjs normally throw an exception to redirect?
     if (error instanceof Error && error.message == "NEXT_REDIRECT") {
