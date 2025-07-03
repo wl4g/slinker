@@ -7,8 +7,13 @@ import {
   getAllShortenedUrls,
   checkDatabaseConnection 
 } from '@/lib/db'
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route"; // 路径根据实际情况调整
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
+
   try {
     // Initialize database
     await initializeDatabase()
@@ -52,7 +57,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert into database
-    const data = await createShortenedUrl(url, shortCode)
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: 'userEmail is required' },
+        { status: 401 }
+      );
+    }
+    const data = await createShortenedUrl(url, shortCode, userEmail)
 
     return NextResponse.json({
       id: data.id.toString(),
@@ -70,7 +81,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: 'userEmail is required' },
+      { status: 401 }
+    );
+  }
   try {
     // Check database connection
     const isConnected = await checkDatabaseConnection()
@@ -84,14 +103,15 @@ export async function GET() {
     // Initialize database
     await initializeDatabase()
 
-    const data = await getAllShortenedUrls(50)
+    const data = await getAllShortenedUrls(userEmail, 50)
 
     const formattedData = data.map(item => ({
       id: item.id.toString(),
       originalUrl: item.original_url,
       shortCode: item.short_code,
       createdAt: item.created_at,
-      clicks: item.clicks
+      clicks: item.clicks,
+      userEmail: item.userEmail
     }))
 
     return NextResponse.json(formattedData)
