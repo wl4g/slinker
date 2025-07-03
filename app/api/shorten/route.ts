@@ -5,7 +5,8 @@ import {
   createShortenedUrl, 
   shortCodeExists, 
   getAllShortenedUrls,
-  checkDatabaseConnection 
+  checkDatabaseConnection,
+  deleteShortenedUrlByUser
 } from '@/lib/db'
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route"; // 路径根据实际情况调整
@@ -121,5 +122,41 @@ export async function GET(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     )
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: 'userEmail is required' },
+      { status: 401 }
+    );
+  }
+  try {
+    const { shortCode } = await request.json();
+    if (!shortCode) {
+      return NextResponse.json(
+        { error: 'shortCode is required' },
+        { status: 400 }
+      );
+    }
+    await initializeDatabase();
+    // 删除操作
+    const deleted = await deleteShortenedUrlByUser(shortCode, userEmail);
+    if (!deleted) {
+      return NextResponse.json(
+        { error: 'Not found or not authorized' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting URL:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

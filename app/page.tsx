@@ -155,6 +155,26 @@ export default function Home() {
 
   const storageInfo = getStorageInfo();
 
+  // 删除短链
+  const handleDelete = async (shortCode: string) => {
+    try {
+      const response = await fetch('/api/shorten', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shortCode }),
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete URL');
+      }
+      setShortenedUrls((prev) => prev.filter((item) => item.shortCode !== shortCode));
+      toast.success('Deleted successfully!');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete URL. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <Toaster position="top-center" />
@@ -387,6 +407,14 @@ export default function Home() {
                         >
                           <ExternalLink className="h-3 w-3" />
                           Test
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(item.shortCode)}
+                          className="gap-1"
+                        >
+                          删除
                         </Button>
                       </div>
                     </div>

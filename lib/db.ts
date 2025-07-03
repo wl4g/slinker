@@ -245,3 +245,24 @@ export async function getAllShortenedUrls(
     return [];
   }
 }
+
+export async function deleteShortenedUrlByUser(shortCode: string, userEmail: string): Promise<boolean> {
+  if (!isVercelPostgresAvailable()) {
+    const idx = inMemoryUrls.findIndex(url => url.short_code === shortCode && url.userEmail === userEmail);
+    if (idx !== -1) {
+      inMemoryUrls.splice(idx, 1);
+      return true;
+    }
+    return false;
+  }
+  try {
+    const result = await sql`
+      DELETE FROM shortened_urls WHERE short_code = ${shortCode} AND user_email = ${userEmail}
+      RETURNING id
+    `;
+    return result.rows.length > 0;
+  } catch (error) {
+    console.error('❌ Error deleting shortened URL:', error);
+    return false;
+  }
+}
