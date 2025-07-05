@@ -141,7 +141,7 @@ export default function Home() {
     if (storageType === "vercel") {
       return {
         icon: <Database className="h-4 w-4" />,
-        text: "Vercel Postgres Connected",
+        text: "DB Connected",
         color: "bg-green-100 text-green-700",
       };
     } else {

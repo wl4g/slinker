@@ -7,13 +7,13 @@ export default function AuthButton() {
   const { data: session, status } = useSession();
 
   if (status === 'loading') {
-    return <Button disabled>加载中...</Button>;
+    return <Button disabled>Loading...</Button>;
   }
 
   if (session) {
     return (
       <div className="flex items-center gap-2">
-        <span>Hello, {session.user?.name || session.user?.email}</span>
+        <span>Hi, {session.user?.name || session.user?.email}</span>
         <Button variant="outline" onClick={() => signOut()}>SignOut</Button>
       </div>
     );
